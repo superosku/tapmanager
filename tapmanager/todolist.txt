@@ -1,0 +1,10 @@
+Pakolliset:
++reggaus kuntoon
++tietojen vaihto
+?järjestykset kuntoon
+-admin paneeli
+
+Muuta:
+-statsit
+-piikin haku tietokannasta
+

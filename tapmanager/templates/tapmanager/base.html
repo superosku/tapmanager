@@ -1,0 +1,59 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Tap manager</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, inital-scale=1.0, user-scalable=no">
+		<link href="{% static "tapmanager/bootstrap/css/bootstrap.min.css" %}" rel="stylesheet">
+		<link href="{% static "tapmanager/style.css" %}" rel="stylesheet">
+	</head>
+	<body>
+		<div class="navbar navbar-default navbar-static-top navbar-inverse" role="navigation">
+			{% block navigator%}
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<div class="navbar-brand">ABP-piikkimanager</div>
+				</div>
+				<div class="navbar-collapse collapse">
+					{% if not user.is_authenticated %}
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="{% url 'tapmanager:login' %}">Login</a></li>
+						<li><a href="{% url 'tapmanager:register' %}">Register</a></li>
+					</ul>
+					{% else %}
+					<ul class="nav navbar-nav">
+						<li><a href="{% url 'tapmanager:taps' %}">Taps</a></li>
+						<li><a href="{% url 'tapmanager:log' %}">Log</a></li>
+						<li><a href="{% url 'tapmanager:settings' %}">Settings</a></li>
+						{% for group in user.groups.all %}
+							{% if group.name == 'tapadmin' %}
+								<li><a href="{% url 'tapmanager:tapadmin' %}">Admin</a></li>
+							{% endif %}
+						{% endfor %}
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="{% url 'tapmanager:logout_view' %}">Logout ({{ user.username }})</a></li>
+					</ul>
+					{% endif %}
+				</div>
+			</div>
+			{% endblock %}
+		</div>
+		<div class="container">
+			{% block content %}
+			
+			{% endblock %}
+		</div>
+		<script type="text/javascript" src="{% static "tapmanager/jquery.min.js" %}"></script>
+		<script type="text/javascript" src="{% static "tapmanager/bootstrap/js/bootstrap.min.js" %}"></script>
+		<script type="text/javascript" src="{% static "tapmanager/fastclick.min.js" %}"></script>
+		<script type="text/javascript" src="{% static "tapmanager/script.js" %}"></script>
+	</body>
+</html>
+

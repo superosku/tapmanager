@@ -1,0 +1,55 @@
+{% extends "tapmanager/base.html" %}
+{% block content %}
+<h1>Log <small>(50 most new<small> or less</small>)</small></h1>
+{% for error in error_list %}
+	<div class="alert alert-danger">
+		<p>{{ error }}</p>
+	</div>
+{% endfor %}
+<p>
+<ul class="nav nav-tabs">
+	<li {% ifequal sel 'all' %}class="active"{% endifequal %}><a href="{% url 'tapmanager:log' %}">All</a></li>
+	<li {% ifequal sel 'me' %}class="active"{% endifequal %}><a href="{% url 'tapmanager:log' %}me">Only mine</a></li>
+</ul>
+</p>
+<section id="no-more-tables">
+	<table class="table table-bordered table-stripped table-condensed cf">
+		<thead class="cf">
+			<tr>
+				<th>User</th>
+				<th>Adder</th>
+				<th>Type</th>
+				<th>Amount</th>
+				<th>Date</th>
+				<th>Remove</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for tap in taps %}
+			<tr class="{% if not tap.active %}noactive{% endif %}">
+				<td data-title="User">{{ tap.user_name }}</td>
+				<td data-title="Adder">{{ tap.maker_name }}</td>
+				<td data-title="Type">{{ tap.taptype_name }}{% if tap.taptype_price %} <small>({{ tap.taptype_price }}){% endif %}</small></td>
+				<td data-title="Amount">{{ tap.amount }} </td>
+				<td data-title="Date">{{ tap.get_date }}</td>
+				<td data-title="Remove">
+					{% if tap.is_recent %}
+					<form method="post">
+						{% csrf_token %}
+						<input type="hidden" name="tapid" value="{{ tap.id }}"></input>
+						{% if tap.active %}
+						<input class="btn btn-xs btn-danger" type="submit" value="Remove"></input>
+						{% else %}
+						<input class="btn btn-xs btn-success" type="submit" value="Restore"></input>
+						{% endif %}
+					</form>
+					{% else %}
+					Too old
+					{% endif %}
+				</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</section>
+{% endblock %}

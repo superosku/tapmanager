@@ -1,0 +1,23 @@
+{% extends "tapmanager/base.html" %}
+{% block content %}
+<div class="smallarea">
+	<h1>Register<small>, or <a href="{% url 'tapmanager:login' %}">login</a></small></h1>
+	<form action="{% url 'tapmanager:register' %}" method="post" role="form">
+		{% csrf_token %}
+		{% for field in form %}
+			<div class="form-group">
+				{{ field.label_tag }} {{ field }}
+			</div>
+			<div class="form-group">
+				{% for error in field.errors %}	
+				<div class="alert alert-danger">
+					{{ error }}
+				</div>
+				{% endfor %}
+			</div>
+		{% endfor %}
+		<input class="btn btn-primary" type="submit" value="Register" />
+	</form>
+</div>
+{% endblock %}
+

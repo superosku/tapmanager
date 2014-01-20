@@ -1,0 +1,30 @@
+{% extends "tapmanager/base.html" %}
+
+from django.contrib.auth.models import User
+
+{% if form.errors %}
+	{{ form.error }}
+{% endif %}
+{% block content %}
+<div class="smallarea">
+	<h1>Logga in<small>, or <a href={% url 'tapmanager:register' %}>registerade</a></small></h1>
+	<form method="post" action="{% url 'tapmanager:login' %}">
+		{% csrf_token %}
+		<input type="hidden" name="next" value="{{ next }}" />
+		{% for field in form %}
+			<div class="form-group">
+				{{ field.label_tag }} {{ field }}
+				{% for error in field.errors %}	
+				<div class="alert alert-danger">
+					{{ error }}
+				</div>
+				{% endfor %}
+			</div>
+		{% endfor %}
+		<div class="form-group">
+			<input class="btn btn-primary" type="submit" value="Login" />
+		</div>
+	</form>
+</div>
+{% endblock %}
+

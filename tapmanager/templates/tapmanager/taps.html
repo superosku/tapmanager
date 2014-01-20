@@ -1,0 +1,62 @@
+{% extends "tapmanager/base.html" %}
+{% block content %}
+	<h1>Taps</h1>
+	{% for error in error_list %}
+		<div class="alert alert-danger">
+			<p>{{ error }}</p>
+		</div>
+	{% endfor %}
+	<div class="list-group">
+	{% for user in users %}
+	<div class="list-group-item">
+		<a>
+			<span class="badge">{{ user.usertapamount.amount }}{{ user.totalsum }}€</span>
+			{% if user.firstname or user.lastname %}
+				{{ user.firstname|title }} {{ user.lastname|title }}
+			{% else %}
+				({{ user.username }})
+			{% endif %}
+		</a>
+		<form class="form-horizontal" role="form" method="post">
+			{% csrf_token %}
+			<input type="hidden" name="userid" value="{{ user.id }}"></input>
+			<div class="form-group row">
+			{% for type in taptypes %}
+				<div class="col-lg-4 col-sm-6 col-xs-12">
+					<div class="form-group">
+						<div class="col-xs-10 col-xs-offset-1">
+							<label class="control-label">
+								{% if type.price %}
+									{{type.name}} ({{type.price}})
+								{% else %}
+									{{type.name}}
+								{% endif %}
+							</label>
+						</div>
+						<div class="input-group input-group-lg col-xs-10 col-xs-offset-1">
+							{% if type.price %}
+							<span class="input-group-btn">
+								<button class="btn btn-default btn-success btn-minus" type="button">-</button>
+							</span>
+							{% endif %}
+							<input placeholder="0" class="form-control" type="number" name="type-{{ type.id }}"></input>
+							{% if type.price %}
+							<span class="input-group-btn">
+								<button class="btn btn-default btn-success btn-add" type="button">+</button>
+							</span>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+			</div>
+			<div class="form-group row">
+				<div class="col-xs-offset-1 col-xs-10">
+					<input class="btn btn-block btn-lg btn-primary" type="submit" value="Add"></input>
+				</div>
+			</div>
+		</form>
+	</div>
+{% endfor %}
+{% endblock %}
+

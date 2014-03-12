@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from django.contrib import messages
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import logout, login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
@@ -19,7 +21,7 @@ from mycustomsql import my_custom_sql
 
 @login_required
 def taps(request):
-	error_list = []
+	#error_list = []
 	taptypes = TapType.objects.filter(active=True).all()#.order_by('-price').all()
 	taptypes = taptypes.extra(
 		select={'price_is_null': 'price IS NULL'},
@@ -31,6 +33,7 @@ def taps(request):
 	if request.method == 'POST':
 		userid = request.POST['userid']
 		# Checkataan kaikki taptypet, fiksuin tapa mita keksin
+		added_funds = False
 		for taptype in taptypes:
 			amount = request.POST["type-" + str(taptype.id)]
 			# Cheking that we can convert amount to decimal
@@ -38,24 +41,28 @@ def taps(request):
 				try:
 					amount = decimal.Decimal(float(amount))
 				except:
-					error_list.append('Invalid value in "' + taptype.name + '", didnt add that.')
+					messages.error(request, 'Invalid value in "' + taptype.name + '", didnt add that.')
 					amount = None
 			# Jos amountti loyty ja on oikeessa muodossa
 			if amount and amount <= 0:
-				error_list.append('Amount <= 0 in "' + taptype.name + '", didint add that.')
+				messages.error(request, 'Amount <= 0 in "' + taptype.name + '", didint add that.')
 			elif amount:
 				user = get_object_or_404(User, pk=int(request.POST['userid']))
 				t = Tap(user=user, maker=request.user, taptype=taptype , amount=amount , active=True)
 				t.save()
+				added_funds = True
+		if added_funds:
+			messages.success(request, "Addeds funds succesfully")
+		else:
+			messages.error(request, "Nothing added")
 		return redirect('tapmanager:taps')
-	return render(request, "tapmanager/taps.html", {'users': users, 'taptypes': taptypes, 'error_list': error_list, })
+	return render(request, "tapmanager/taps.html", {'users': users, 'taptypes': taptypes, 'messages': messages.get_messages(request) })
 @login_required
 def logout_view(request):
 	logout(request)
 	return redirect('tapmanager:login')
 @login_required
 def log(request, filter_log=None):
-	error_list = []
 	if request.method == 'POST':
 		tapid = request.POST['tapid']
 		tap = get_object_or_404(Tap, pk=int(tapid))
@@ -69,14 +76,14 @@ def log(request, filter_log=None):
 				tap.active = True
 			tap.save()
 		else:
-			error_list.append('Tap not recent enough. You cannot modify it')
+			messages.error(request, 'Tap not recent enough. You cannot modify it')
 	if filter_log=='me':
 		sel = 'me'
 		taps = Tap.objects.filter(Q(user__id=request.user.id) | Q(maker__id=request.user.id)).order_by('-date')[:50]
 	else:
 		sel = 'all'
 		taps = Tap.objects.order_by('-date')[:50]
-	return render(request, "tapmanager/log.html", {'taps': taps, 'error_list': error_list, 'sel': sel })
+	return render(request, "tapmanager/log.html", {'taps': taps, 'sel': sel, 'messages': messages.get_messages(request) })
 @login_required
 def settings(request):
 	form = SettingsForm(request.POST or None)
@@ -129,6 +136,7 @@ def login_view(request):
 	if request.POST and form.is_valid():
 		username = form.cleaned_data['username']
 		password = form.cleaned_data['password']
+		
 		user = authenticate(username=username, password=password)
 		if user is not None:
 			if user.is_active:

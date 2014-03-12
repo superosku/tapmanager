@@ -19,6 +19,7 @@ $(document).ready( function () {
 			$(this).parent().next().val(value);
 	});
 	$(".list-group-item>a").click( function() {
+		
 		if (!$(this).next().is(":visible")) {
 			$(".list-group-item>a").each( function() {
 				$(this).next().hide();
@@ -27,6 +28,7 @@ $(document).ready( function () {
 		}
 		else
 			$(this).next().hide();
+		
 		//$(this).next().animate({height:"toggle"});
 	});
 });

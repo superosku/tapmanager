@@ -132,21 +132,19 @@ def stats(request):
 	return render(request, "tapmanager/stats.html", )
 
 def login_view(request):
-	form = AuthenticationForm(data=request.POST or None)
+	form = MyAuthForm(data=request.POST or None)
 	if request.POST and form.is_valid():
 		username = form.cleaned_data['username']
 		password = form.cleaned_data['password']
-		
 		user = authenticate(username=username, password=password)
-		if user is not None:
-			if user.is_active:
-				login(request, user)
-				return redirect('tapmanager:taps')
-	else:
-		form = AuthenticationForm()
+		if user:
+			login(request, user)
+			return redirect('tapmanager:taps')
+		else:
+			messages.error(request, "Error in login")
 	form.fields['username'].widget.attrs['class'] = 'form-control' 
 	form.fields['password'].widget.attrs['class'] = 'form-control' 
-	return render(request, "tapmanager/login.html", {'form':form}, context_instance=RequestContext(request))
+	return render(request, "tapmanager/login.html", {'form':form, 'messages': messages.get_messages(request)}, context_instance=RequestContext(request))
 
 def register(request):
 	form = RegisterForm(data=request.POST or None)

@@ -1,6 +1,21 @@
 from django import forms
 
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import AuthenticationForm
+
+class MyAuthForm(AuthenticationForm):
+	username = forms.CharField(
+			max_length=254,
+			label="Username / Email")
+	password = forms.CharField(label="Password", widget=forms.PasswordInput)
+	def __init__(self, request=None, *args, **kwargs):
+		self.request = request
+		super(AuthenticationForm, self).__init__(*args, **kwargs)
+	def clean(self):
+		#username = self.cleaned_data.get('username')
+		#password = self.cleaned_data.get('password')
+		return self.cleaned_data
+		
 
 class RegisterForm(forms.Form):
 	username = forms.CharField(
@@ -32,6 +47,12 @@ class RegisterForm(forms.Form):
 		if p1 != p2:
 			raise forms.ValidationError("Passwords didint match")
 		return p1
+	def clean_email(self):
+		existing = User.objects.filter(email__iexact=self.cleaned_data['email'])
+		if existing.exists():
+			raise forms.ValidationError(("Email already in use"))
+		return self.cleaned_data['email']
+
 
 class SettingsForm(forms.Form):
 	email = forms.EmailField(
@@ -61,6 +82,11 @@ class SettingsForm(forms.Form):
 		if new1 != new2:
 			raise forms.ValidationError('New passwords didnt match')
 		return new2
+	def clean_email(self):
+		existing = User.objects.filter(email__iexact=self.cleaned_data['email'])
+		if existing.exists():
+			raise forms.ValidationError(("Email already in use"))
+		return self.cleaned_data['email']
 
 class CustomUserChoiceField(forms.ModelChoiceField):
 	def label_from_instance(self, obj):

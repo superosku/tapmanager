@@ -19,6 +19,9 @@ import decimal
 
 from mycustomsql import my_custom_sql
 
+import datetime
+from django.utils import timezone
+
 @login_required
 def taps(request):
 	#error_list = []
@@ -32,6 +35,9 @@ def taps(request):
 
 	if request.method == 'POST':
 		userid = request.POST['userid']
+		if Tap.objects.filter(maker=request.user, date__gt=timezone.now()-datetime.timedelta(seconds=10)).count() > 0:
+			messages.error(request, "Too frequent, wait 10s")
+			return redirect('tapmanager:taps')
 		# Checkataan kaikki taptypet, fiksuin tapa mita keksin
 		added_funds = False
 		for taptype in taptypes:
@@ -157,7 +163,3 @@ def register(request):
 		user = User.objects.create_user(username, email, pass1, first_name=firstname, last_name=lastname)
 		group, created = Group.objects.get_or_create(name='tapmanager')
 		group.user_set.add(user)
-		return redirect('tapmanager:login')
-	return render(request, "tapmanager/register.html", {'form': form,})
-
-# Create your views here.

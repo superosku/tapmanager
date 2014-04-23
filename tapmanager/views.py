@@ -163,3 +163,5 @@ def register(request):
 		user = User.objects.create_user(username, email, pass1, first_name=firstname, last_name=lastname)
 		group, created = Group.objects.get_or_create(name='tapmanager')
 		group.user_set.add(user)
+		return redirect('tapmanager:login')
+	return render(request, "tapmanager/register.html", {'form': form})

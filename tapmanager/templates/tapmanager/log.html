@@ -1,6 +1,6 @@
 {% extends "tapmanager/base.html" %}
 {% block content %}
-<h1>Log <small>(50 most new<small> or less</small>)</small></h1>
+<h1>Log</h1>
 {% for error in error_list %}
 	<div class="alert alert-danger">
 		<p>{{ error }}</p>
@@ -9,7 +9,7 @@
 <p>
 <ul class="nav nav-tabs">
 	<li {% ifequal sel 'all' %}class="active"{% endifequal %}><a href="{% url 'tapmanager:log' %}">All</a></li>
-	<li {% ifequal sel 'me' %}class="active"{% endifequal %}><a href="{% url 'tapmanager:log' %}me">Only mine</a></li>
+	<li {% ifequal sel 'me' %}class="active"{% endifequal %}><a href="{% url 'tapmanager:log' '0' 'me' %}">Only mine</a></li>
 </ul>
 </p>
 <section id="no-more-tables">
@@ -52,4 +52,9 @@
 		</tbody>
 	</table>
 </section>
+<ul class="pagination">
+    {% for i in pages %}
+    <li {% if False %}class="active"{% endif %}><a href="{% url 'tapmanager:log' i sel %}">{{ i }}</a></li>
+    {% endfor %}
+</ul>
 {% endblock %}

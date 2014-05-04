@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from math import ceil
 
 from django.contrib import messages
 
@@ -31,11 +32,18 @@ def taps(request):
     users = my_custom_sql()
 
     if request.method == 'POST':
+        try:
+            user_id = int(request.POST['userid'])
+        except:
+            messages.error(request, "Invalid user id")
+            return redirect('tapmanager:taps')
         if Tap.objects.filter(
                 maker=request.user,
+                user=user_id,
                 date__gt=timezone.now()
                 - datetime.timedelta(seconds=10)).count() > 0:
             messages.error(request, "Too frequent, wait 10s")
+            return redirect('tapmanager:taps')
         # Checkataan kaikki taptypet, fiksuin tapa mita keksin
         added_funds = False
         for taptype in taptypes:
@@ -55,7 +63,7 @@ def taps(request):
                     request, 'Amount <= 0 in "' +
                     taptype.name + '", didint add that.')
             elif amount:
-                user = get_object_or_404(User, pk=int(request.POST['userid']))
+                user = get_object_or_404(User, pk=user_id)
                 t = Tap(
                     user=user, maker=request.user, taptype=taptype,
                     amount=amount, active=True)
@@ -101,7 +109,9 @@ def log(request, page_num=None, filter_log=None):
         taps = Tap.objects.filter(
             Q(user__id=request.user.id) |
             Q(maker__id=request.user.id)).order_by('-date')
-        amount = Tap.objects.filter(Q(user__id=request.user.id)).count()
+        amount = Tap.objects.filter(
+            Q(user__id=request.user.id) |
+            Q(maker__id=request.user.id)).count()
     else:
         sel = 'all'
         taps = Tap.objects.order_by('-date')
@@ -115,7 +125,8 @@ def log(request, page_num=None, filter_log=None):
         request, "tapmanager/log.html",
         {'taps': taps, 'sel': sel,
             'messages': messages.get_messages(request),
-            'pages': range(amount/50)})
+            'pages': range(int(ceil(amount/50.0))),
+            'page_num': page_num})
 
 
 @login_required

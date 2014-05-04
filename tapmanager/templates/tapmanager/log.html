@@ -54,7 +54,7 @@
 </section>
 <ul class="pagination">
     {% for i in pages %}
-    <li {% if False %}class="active"{% endif %}><a href="{% url 'tapmanager:log' i sel %}">{{ i }}</a></li>
+    <li {% if page_num == i %}class="active"{% endif %}><a href="{% url 'tapmanager:log' i sel %}">{{ i|add:1 }}</a></li>
     {% endfor %}
 </ul>
 {% endblock %}

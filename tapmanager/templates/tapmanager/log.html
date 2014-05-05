@@ -9,7 +9,9 @@
 <p>
 <ul class="nav nav-tabs">
 	<li {% ifequal sel 'all' %}class="active"{% endifequal %}><a href="{% url 'tapmanager:log' %}">All</a></li>
-	<li {% ifequal sel 'me' %}class="active"{% endifequal %}><a href="{% url 'tapmanager:log' '0' 'me' %}">Only mine</a></li>
+	<li {% ifequal sel 'me' %}class="active"{% endifequal %}><a href="{% url 'tapmanager:log' '0' 'me' %}">Mine</a></li>
+	<li {% ifequal sel 'byme' %}class="active"{% endifequal %}><a href="{% url 'tapmanager:log' '0' 'byme' %}">By me</a></li>
+	<li {% ifequal sel 'tome' %}class="active"{% endifequal %}><a href="{% url 'tapmanager:log' '0' 'tome' %}">For me</a></li>
 </ul>
 </p>
 <section id="no-more-tables">

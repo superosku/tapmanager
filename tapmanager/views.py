@@ -112,6 +112,18 @@ def log(request, page_num=None, filter_log=None):
         amount = Tap.objects.filter(
             Q(user__id=request.user.id) |
             Q(maker__id=request.user.id)).count()
+    elif filter_log == 'tome':
+        sel = 'tome'
+        taps = Tap.objects.filter(
+            Q(user__id=request.user.id)).order_by('-date')
+        amount = Tap.objects.filter(
+            Q(user__id=request.user.id)).count()
+    elif filter_log == 'byme':
+        sel = 'byme'
+        taps = Tap.objects.filter(
+            Q(maker__id=request.user.id)).order_by('-date')
+        amount = Tap.objects.filter(
+            Q(maker__id=request.user.id)).count()
     else:
         sel = 'all'
         taps = Tap.objects.order_by('-date')
